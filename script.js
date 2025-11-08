@@ -9,64 +9,64 @@
             id: "style1",
             name: "Feather",
             cat: ["Short"],
-            img: "../assests/style1.png",
+            img: "./assests/style1.png",
           },
           {
             id: "style2",
             name: "Wolf Cut",
             cat: ["Medium"],
-            img: "../assests/style2.png",
+            img: "./assests/style2.png",
           },
           {
             id: "style3",
             name: "Bob Cut",
             cat: ["curly"],
-            img: "../assests/style3.png",
+            img: "./assests/style3.png",
           },
 
           {
             id: "style4",
             name: "Pixie Cut",
             cat: ["Long"],
-            img: "../assests/style4.png",
+            img: "./assests/style4.png",
           },
 
           {
             id: "style5",
             name: "Blunt Bob",
             cat: ["medium"],
-            img: "../assests/style5.png",
+            img: "./assests/style5.png",
           },
 
           {
             id: "style6",
             name: "Layered Bob",
             cat: ["short"],
-            img: "../assests/m1.png",
+            img: "./assests/m1.png",
           },
           {
             id: "style7",
             name: "Buzz Cut",
             cat: ["curly"],
-            img: "../assests/m2.png",
+            img: "./assests/m2.png",
           },
           {
             id: "style6",
             name: "Crop Cut",
             cat: ["Long"],
-            img: "../assests/m3.png",
+            img: "./assests/m3.png",
           },
           {
             id: "style7",
             name: "Bob Cut",
             cat: ["medium"],
-            img: "../assests/m4.png",
+            img: "./assests/m4.png",
           },
           {
             id: "style8",
             name: "Asymmetrical Bob",
             cat: ["short"],
-            img: "../assests/m5.png",
+            img: "./assests/m5.png",
           },
         ];
         const CATS = [
