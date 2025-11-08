@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>StyleMorph — Real Try</title>
+  <style>
+    :root{
+      --bg: 18 18 27;
+      --glass: 255 255 255;
+      --ink: 240 240 247;
+      --acc: 168 85 247;
+      --muted: 148 163 184;
+      --ring: 59 130 246;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      color: rgb(var(--ink));
+      background:
+        radial-gradient(80vmax 60vmax at 10% 10%, #5b21b6 0%, transparent 60%),
+        radial-gradient(80vmax 60vmax at 90% 20%, #e11d48 0%, transparent 60%),
+        rgb(var(--bg));
+      overflow-x:hidden;
+    }
+
+    main{padding:100px 20px; max-width:900px; margin:0 auto;}
+
+    h1{font-size:clamp(28px, 4vw, 44px); margin:0 0 12px;}
+    p.lead{color:rgb(var(--muted)); margin-bottom:30px;}
+
+    .stage{
+      position:relative; width:100%; aspect-ratio:3/4; overflow:hidden; border-radius:20px;
+      background:black; display:grid; place-items:center;
+    }
+    video, canvas{width:100%; height:100%; object-fit:cover; border-radius:20px;}
+    .overlay{position:absolute; top:0; left:0; width:100%; height:100%;}
+
+    .toolbar{display:flex; gap:12px; margin-top:16px; flex-wrap:wrap;}
+    .btn{padding:10px 16px; border-radius:12px; border:1px solid rgba(255,255,255,.12);
+       background: rgba(255,255,255,.06); color:white; cursor:pointer}
+    .btn:hover{background: rgba(255,255,255,.12)}
+
+    /* Modal styling */
+    .modal{
+      position:fixed; inset:0; display:none; align-items:center; justify-content:center;
+      background:rgba(0,0,0,.6); z-index:100;
+    }
+    .modal.active{display:flex;}
+    .modal-content{
+      background:rgba(255,255,255,.08);
+      backdrop-filter:blur(20px);
+      border-radius:20px;
+      padding:20px;
+      max-width:800px;
+      max-height:80vh;
+      overflow:auto;
+      box-shadow:0 8px 24px rgba(0,0,0,.4);
+    }
+    .grid{
+      display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
+      gap:16px;
+    }
+    .card{
+      border-radius:16px;
+      overflow:hidden;
+      background:rgba(255,255,255,.06);
+      cursor:pointer;
+      transition:transform .2s;
+    }
+    .card:hover{transform:scale(1.05);}
+    .card img{width:100%; height:200px; object-fit:cover; display:block;}
+    .close-btn{
+      float:right; cursor:pointer; font-weight:bold; color:white; margin-bottom:10px;
+    }
+
+    /* draggable overlay */
+    .draggable{
+      position:absolute; top:20%; left:30%;
+      width:200px; height:auto;
+      cursor:move;
+      user-select:none;
+    }
+    .resizer{
+      width:15px; height:15px; background:#fff; border-radius:50%;
+      position:absolute; right:-8px; bottom:-8px; cursor:se-resize;
+    }
+      /* Navbar responsive */
+      .hamburger {
+        display: none;
+        background: none;
+        border: none;
+        color: white;
+        font-size: 26px;
+        cursor: pointer;
+        margin-left: auto;
+      }
+
+      .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      @media (max-width: 768px) {
+        .hamburger {
+          display: block;
+        }
+        .nav-links {
+          position: absolute;
+          top: 70px;
+          right: 16px;
+          left: 16px;
+          flex-direction: column;
+          background: rgba(30, 30, 40, 0.95);
+          border-radius: 12px;
+          padding: 12px;
+          gap: 12px;
+          display: none;
+        }
+        .nav-links.show {
+          display: flex;
+          animation: slideDown 0.3s ease-out;
+        }
+      }
+
+      @keyframes slideDown {
+        from {
+          opacity: 0;
+          transform: translateY(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      @media (max-width: 768px) {
+        .nav-links {
+          display: none;
+          flex-direction: column;
+          background: rgba(30, 30, 40, 0.95);
+          border-radius: 12px;
+          padding: 12px;
+          gap: 12px;
+          position: absolute;
+          top: 70px;
+          right: 16px;
+          left: 16px;
+        }
+        .nav-links.show {
+          display: flex;
+          animation: slideDown 0.3s ease-out;
+        }
+      }
+      
+
+      /* Navbar */
+      .nav {
+        position: fixed;
+        inset: 16px 16px auto 16px;
+        height: 64px;
+        z-index: 50;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 14px;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 800;
+        letter-spacing: 0.5px;
+      }
+      .brand .logo {
+        width: 40px;
+        height: 40px;
+        display: grid;
+        place-items: center;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #0ea5e9, #a855f7);
+        box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.25),
+          0 8px 18px rgba(0, 0, 0, 0.35);
+      }
+      .brand .logo svg {
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+      }
+      .nav a.link {
+        padding: 10px 12px;
+        border-radius: 12px;
+        color: rgb(var(--muted));
+        font-weight: 600;
+      }
+      .nav a.link.active,
+      .nav a.link:hover {
+        color: white;
+        background: rgba(255, 255, 255, 0.07);
+      }
+      .spacer {
+        flex: 1;
+      }
+      .btn {
+        padding: 10px 14px;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(255, 255, 255, 0.06);
+        color: white;
+        cursor: pointer;
+      }
+      .btn:hover {
+        background: rgba(255, 255, 255, 0.1);
+      }
+  </style>
+</head>
+<body>
+  <nav class="nav glass" role="navigation" aria-label="Main">
+      <div class="brand" aria-label="StyleMorph Logo">
+        <div class="logo" aria-hidden="true">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
+            <path
+              d="M4 14c0-6 5-9 8-10 3 1 8 4 8 10 0 4-3 6-6 6-1.7 0-3-.6-4-1.7-.9 1.1-2.3 1.7-4 1.7 3-1.5 2-6 2-8"
+              stroke="#fff"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </div>
+        <div>
+          StyleMorph <span class="muted" style="font-weight: 600">Hair</span>
+        </div>
+      </div>
+
+      <!-- Hamburger -->
+      <button class="hamburger" id="navToggle" aria-label="Toggle menu">
+        ☰
+      </button>
+
+      <div class="nav-links" id="navLinks">
+        <a class="link" data-route="home" href="index.html">Home</a>
+        <a class="link" data-route="try" href="index.html#try">Try-On</a>
+        <a class="link" data-route="gallery" href="index.html#gallery">Gallery</a>
+        <a class="link" data-route="profile" href="index.html#profile">Profile</a>
+        <a class="link" data-route="saved" href="index.html#saved">Saved</a>
+        <a class="link" href="real-try.html">Real-Try</a>
+        <a class="link" href="mens.html">Mens Wears</a>
+        <a class="link" href="women.html">Womens Wear</a>
+      </div>
+
+      <!-- Keep Export button always visible -->
+      <button class="btn" id="exportBtn">Export PNG</button>
+    </nav>
+
+
+  <main>
+    <h1>Real Try Projector</h1>
+    <p class="lead">Use your camera with overlays for hairstyles or clothes. On supported phones, activate the torch for projector effect.</p>
+
+    <div class="stage glass">
+      <video id="video" autoplay playsinline></video>
+      <div id="overlay-container"></div>
+    </div>
+
+    <div class="toolbar">
+      <button id="chooseHair" class="btn">💇 Choose Hairstyle</button>
+      <button id="clearOverlay" class="btn">❌ Clear</button>
+    </div>
+  </main>
+
+  <!-- Modal -->
+  <div id="modal" class="modal">
+    <div class="modal-content">
+      <span id="closeModal" class="close-btn">✖</span>
+      <h2 style="margin-top:0;">Choose an Item</h2>
+      <div class="grid" id="itemGrid">
+        <!-- items injected dynamically -->
+      </div>
+    </div>
+  </div>
+
+ <script>
+  const video = document.getElementById('video');
+  let stream, track, torchOn = false;
+  const overlayContainer = document.getElementById("overlay-container");
+
+  async function startCam(){
+    try{
+      stream = await navigator.mediaDevices.getUserMedia({ video:{ facingMode:"user" } });
+      video.srcObject = stream;
+      track = stream.getVideoTracks()[0];
+    }catch(err){ alert("Camera access denied: "+err); }
+  }
+  startCam();
+
+  // Modal logic
+  const modal = document.getElementById("modal");
+  const itemGrid = document.getElementById("itemGrid");
+  const closeModal = document.getElementById("closeModal");
+  let currentType = "";
+
+  document.getElementById("chooseHair").onclick = () => {openModal("hair");};
+
+  closeModal.onclick = () => modal.classList.remove("active");
+
+  function openModal(type){
+    currentType = type;
+    itemGrid.innerHTML = "";
+    let items = [];
+    if(type==="hair"){
+      items = ["../assests/style1.png","../assests/style2.png","../assests/style3.png"];
+    }
+    items.forEach(src=>{
+      const card = document.createElement("div");
+      card.className="card";
+      card.innerHTML=`<img src="${src}" alt="">`;
+      card.onclick=()=>{ addOverlay(src); modal.classList.remove("active"); };
+      itemGrid.appendChild(card);
+    });
+    modal.classList.add("active");
+  }
+
+  function addOverlay(src){
+    const wrapper = document.createElement("div");
+    wrapper.className = "draggable";
+    wrapper.style.position = "absolute";
+    wrapper.style.left = "50px";
+    wrapper.style.top = "50px";
+    wrapper.style.width = "150px";
+
+    const img = document.createElement("img");
+    img.src = src;
+    img.style.width = "100%";
+    img.style.height = "auto";
+    img.draggable = false;
+
+    const resizer = document.createElement("div");
+    resizer.className = "resizer";
+    resizer.style.width = "15px";
+    resizer.style.height = "15px";
+    resizer.style.background = "red";
+    resizer.style.position = "absolute";
+    resizer.style.right = "0";
+    resizer.style.bottom = "0";
+    resizer.style.cursor = "se-resize";
+
+    wrapper.appendChild(img);
+    wrapper.appendChild(resizer);
+    overlayContainer.appendChild(wrapper);
+
+    makeDraggable(wrapper,resizer);
+  }
+
+  function makeDraggable(el,resizer){
+    let isDragging=false, isResizing=false, startX, startY, startWidth, startHeight, startLeft, startTop;
+
+    el.onmousedown=(e)=>{
+      if(e.target===resizer){ 
+        isResizing=true;
+        startX=e.clientX; startY=e.clientY;
+        startWidth=el.offsetWidth; startHeight=el.offsetHeight;
+      }else{
+        isDragging=true;
+        startX=e.clientX; startY=e.clientY;
+        startLeft=el.offsetLeft; startTop=el.offsetTop;
+      }
+      e.preventDefault();
+    };
+
+    window.onmousemove=(e)=>{
+      if(isDragging){
+        el.style.left = startLeft + (e.clientX-startX) + "px";
+        el.style.top = startTop + (e.clientY-startY) + "px";
+      }
+      if(isResizing){
+        el.style.width = startWidth + (e.clientX-startX) + "px";
+        el.style.height = startHeight + (e.clientY-startY) + "px";
+      }
+    };
+    window.onmouseup=()=>{isDragging=false; isResizing=false;};
+  }
+
+  document.getElementById("clearOverlay").onclick=()=>{overlayContainer.innerHTML="";};
+
+  window.addEventListener("DOMContentLoaded", () => {
+    const params = new URLSearchParams(window.location.search);
+    const imgSrc = params.get("img");
+    if (imgSrc) {
+      addOverlay(imgSrc);
+    }
+  });
+  // Navbar toggle for mobile
+      document.getElementById("navToggle").addEventListener("click", () => {
+        document.getElementById("navLinks").classList.toggle("show");
+      });
+</script>
+</body>
+</html>

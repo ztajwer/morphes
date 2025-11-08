@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>StyleMorph — Hair Try‑On</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <nav class="nav glass" role="navigation" aria-label="Main">
+      <div class="brand" aria-label="StyleMorph Logo">
+        <div class="logo" aria-hidden="true">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
+            <path
+              d="M4 14c0-6 5-9 8-10 3 1 8 4 8 10 0 4-3 6-6 6-1.7 0-3-.6-4-1.7-.9 1.1-2.3 1.7-4 1.7 3-1.5 2-6 2-8"
+              stroke="#fff"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </div>
+        <div>
+          StyleMorph <span class="muted" style="font-weight: 600">Hair</span>
+        </div>
+      </div>
+
+      <!-- Hamburger -->
+      <button class="hamburger" id="navToggle" aria-label="Toggle menu">
+        ☰
+      </button>
+
+      <div class="nav-links" id="navLinks">
+        <a class="link" data-route="home" href="index.html">Home</a>
+        <a class="link" data-route="try" href="#try">Try-On</a>
+        <a class="link" data-route="gallery" href="#gallery">Gallery</a>
+        <a class="link" data-route="profile" href="#profile">Profile</a>
+        <a class="link" data-route="saved" href="#saved">Saved</a>
+        <a class="link" href="real-try.html">Real-Try</a>
+        <a class="link" href="mens.html">Mens Wears</a>
+        <a class="link" href="women.html">Womens Wear</a>
+      </div>
+
+      <!-- Keep Export button always visible -->
+      <button class="btn" id="exportBtn">Export PNG</button>
+    </nav>
+
+    <main>
+      <!-- HOME -->
+      <section id="home" class="view">
+        <div class="glass card">
+          <h1>Try hairstyles instantly — no apps, no signup.</h1>
+          <p class="lead">
+            Upload your photo, pick a style, then drag, scale, and rotate until
+            it fits. Our transparent, shadowed UI keeps the focus on your face.
+          </p>
+          <div class="toolbar" style="margin-top: 12px">
+            <span class="pill">Responsive</span>
+            <span class="pill">Secure uploads</span>
+            <span class="pill">Local saves</span>
+            <span class="pill">Zoomable styles</span>
+          </div>
+        </div>
+
+        <div class="grid cols-3" style="margin-top: 16px">
+          <div class="glass card">
+            <h2>1) Upload your photo</h2>
+            <p class="muted">
+              Face centered, neutral lighting. PNG/JPG/WebP up to 10MB.
+            </p>
+            <div
+              class="upload"
+              id="uploadBox"
+              tabindex="0"
+              aria-label="Upload your face photo by clicking or dragging a file here"
+            >
+              <input
+                class="sr-only"
+                type="file"
+                id="fileInput"
+                accept="image/png,image/jpeg,image/webp"
+              />
+              <p>
+                Drag & drop here or
+                <button class="btn" id="browseBtn" type="button">Browse</button>
+              </p>
+              <p class="muted" id="uploadMsg"></p>
+            </div>
+          </div>
+          <div class="glass card">
+            <h2>2) Choose a hairstyle</h2>
+            <p class="muted">
+              Browse categories like Short, Medium, Long, Curly, Color. Click
+              any style to send it to Try‑On.
+            </p>
+            <div class="toolbar" id="catBar"></div>
+            <div
+              class="grid cols-4"
+              id="miniGallery"
+              style="margin-top: 12px"
+            ></div>
+          </div>
+          <div class="glass card">
+            <h2>3) Fit it on you</h2>
+            <p class="muted">
+              Drag to move · Shift+Drag to rotate · Mouse wheel / pinch to scale
+              · R to reset. Use sliders for fine control. Click Export to save
+              PNG.
+            </p>
+            <div class="stage" id="stageHome">
+              <canvas
+                id="canvasHome"
+                width="900"
+                height="1200"
+                aria-label="Preview canvas"
+              ></canvas>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TRY-ON -->
+      <section id="try" class="view" hidden>
+        <div class="grid cols-3">
+          <div class="glass card">
+            <h2>Your Photo</h2>
+            <div
+              class="upload"
+              id="uploadBox2"
+              tabindex="0"
+              aria-label="Upload your face photo by clicking or dragging a file here (secondary)"
+            >
+              <input
+                class="sr-only"
+                type="file"
+                id="fileInput2"
+                accept="image/png,image/jpeg,image/webp"
+              />
+              <p>
+                Drag & drop here or
+                <button class="btn" id="browseBtn2" type="button">
+                  Browse
+                </button>
+              </p>
+              <p class="muted" id="uploadMsg2"></p>
+            </div>
+            <div class="ghost" style="padding: 12px; margin-top: 12px">
+              <p class="muted" style="margin: 0">
+                Tips: Face should be upright. Use the scale slider to match hair
+                width to your head, then nudge with arrow keys for pixel-perfect
+                alignment.
+              </p>
+            </div>
+          </div>
+          <div class="glass card" style="grid-column: span 2">
+            <h2>Try‑On Stage</h2>
+            <div class="stage" id="stage">
+              <canvas
+                id="canvas"
+                width="900"
+                height="1200"
+                aria-live="polite"
+              ></canvas>
+            </div>
+            <div class="controls" style="margin-top: 12px">
+              <div class="row">
+                <div>
+                  <label for="scale">Scale</label>
+                  <input
+                    type="range"
+                    id="scale"
+                    min="0.2"
+                    max="3"
+                    step="0.01"
+                    value="1"
+                  />
+                </div>
+                <div>
+                  <label for="rotation">Rotation (°)</label>
+                  <input
+                    type="range"
+                    id="rotation"
+                    min="-45"
+                    max="45"
+                    step="0.1"
+                    value="0"
+                  />
+                </div>
+              </div>
+              <div class="row">
+                <div>
+                  <label for="x">X Offset</label>
+                  <input
+                    type="range"
+                    id="x"
+                    min="-400"
+                    max="400"
+                    step="1"
+                    value="0"
+                  />
+                </div>
+                <div>
+                  <label for="y">Y Offset</label>
+                  <input
+                    type="range"
+                    id="y"
+                    min="-400"
+                    max="400"
+                    step="1"
+                    value="0"
+                  />
+                </div>
+              </div>
+              <div class="toolbar" style="margin-top: 8px">
+                <button class="btn" id="resetBtn" type="button">Reset</button>
+                <button
+                  class="btn"
+                  id="saveBtn"
+                  type="button"
+                  title="Save this look locally"
+                >
+                  Save Look
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- GALLERY -->
+      <section id="gallery" class="view" hidden>
+        <div class="glass card">
+          <h2>Hairstyle Gallery</h2>
+          <p class="muted">
+            Click a style to try. Use categories to filter. Images are
+            transparent PNG/SVG so they layer naturally over photos.
+          </p>
+          <div class="toolbar" id="catBar2" style="margin-bottom: 12px"></div>
+          <div class="grid cols-4" id="fullGallery"></div>
+        </div>
+      </section>
+
+      <!-- PROFILE -->
+      <section id="profile" class="view" hidden>
+        <div class="grid cols-3">
+          <div class="glass card">
+            <h2>Your Profile</h2>
+            <p class="muted">
+              Optional — helps with quick size hints (hair width guideline).
+            </p>
+            <label
+              >Name<br /><input
+                id="name"
+                class="ghost"
+                style="
+                  width: 100%;
+                  padding: 10px;
+                  color: white;
+                  background: rgba(255, 255, 255, 0.06);
+                  border-radius: 10px;
+                  border: 1px solid rgba(255, 255, 255, 0.12);
+                "
+                placeholder="Your name"
+            /></label>
+            <div class="grid cols-3" style="margin-top: 10px">
+              <label
+                >Head Width (cm)<br /><input
+                  id="headW"
+                  type="number"
+                  class="ghost"
+                  style="
+                    width: 100%;
+                    padding: 10px;
+                    color: white;
+                    background: rgba(255, 255, 255, 0.06);
+                    border-radius: 10px;
+                    border: 1px solid rgba(255, 255, 255, 0.12);
+                  "
+                  placeholder="14"
+              /></label>
+              <label
+                >Hairline to Chin (cm)<br /><input
+                  id="faceH"
+                  type="number"
+                  class="ghost"
+                  style="
+                    width: 100%;
+                    padding: 10px;
+                    color: white;
+                    background: rgba(255, 255, 255, 0.06);
+                    border-radius: 10px;
+                    border: 1px solid rgba(255, 255, 255, 0.12);
+                  "
+                  placeholder="18"
+              /></label>
+              <label
+                >Preference<br />
+                <select
+                  id="pref"
+                  class="ghost"
+                  style="
+                    width: 100%;
+                    padding: 10px;
+                    color: white;
+                    background: rgba(255, 255, 255, 0.06);
+                    border-radius: 10px;
+                    border: 1px solid rgba(255, 255, 255, 0.12);
+                  "
+                >
+                  <option>Natural</option>
+                  <option>Bold</option>
+                  <option>Color</option>
+                  <option>Curly</option>
+                </select>
+              </label>
+            </div>
+            <button class="btn" id="saveProfile" style="margin-top: 12px">
+              Save Profile
+            </button>
+            <p class="muted" id="sizeHint" style="margin-top: 8px"></p>
+          </div>
+          <div class="glass card" style="grid-column: span 2">
+            <h2>Tips for Realistic Fit</h2>
+            <ul class="muted">
+              <li>Match hair width to your head’s widest point.</li>
+              <li>
+                Lift or lower along Y until the hairline aligns with your
+                natural hairline.
+              </li>
+              <li>Use slight rotation to follow face tilt.</li>
+              <li>
+                Prefer PNG/SVG styles to preserve transparency and soft edges.
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- SAVED LOOKS -->
+      <section id="saved" class="view" hidden>
+        <div class="glass card">
+          <h2>Saved Looks</h2>
+          <p class="muted">
+            Your looks are stored locally on this device. Click any to load back
+            to Try‑On.
+          </p>
+          <div class="grid cols-4" id="savedGrid"></div>
+        </div>
+      </section>
+    </main>
+
+    <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+
+    <div id="home">
+          <!-- ========== FAQ Section ========== -->
+    <section id="faq" class="faq-section">
+      <h2 class="faq-title">Frequently Asked Questions</h2>
+      <div class="faq-container">
+        <div class="faq-item">
+          <button class="faq-question">
+            Can I upload my own photo? <span class="arrow">+</span>
+          </button>
+          <div class="faq-answer">
+            <p>
+              Yes! You can upload your selfie and instantly try different
+              hairstyles on it.
+            </p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question">
+            Is StyleMorph free to use? <span class="arrow">+</span>
+          </button>
+          <div class="faq-answer">
+            <p>
+              Absolutely! Our basic features are completely free with no hidden
+              charges.
+            </p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question">
+            Can I save my favorite looks? <span class="arrow">+</span>
+          </button>
+          <div class="faq-answer">
+            <p>
+              Yes, you can save your looks and view them anytime in the "Saved"
+              section.
+            </p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question">
+            Does it work on mobile devices? <span class="arrow">+</span>
+          </button>
+          <div class="faq-answer">
+            <p>
+              Yes, StyleMorph is fully responsive and works beautifully on
+              phones and tablets.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+<!-- ===== Testimonials Section ===== -->
+<section id="testimonials" class="testimonials-section">
+  <h2 class="section-title">What Our Users Say</h2>
+  <div class="testimonials-grid">
+
+    <div class="testimonial-card glass">
+      <div class="user">
+        <img src="https://i.pravatar.cc/80?img=5" alt="User 1">
+        <div>
+          <h3>Ayesha Khan</h3>
+          <span class="role">Student</span>
+        </div>
+      </div>
+      <p class="review">
+        “StyleMorph completely changed how I choose my hairstyles! Now I always know what suits me best before trying.”
+      </p>
+      <div class="stars">★★★★★</div>
+    </div>
+
+    <div class="testimonial-card glass">
+      <div class="user">
+        <img src="https://i.pravatar.cc/80?img=12" alt="User 2">
+        <div>
+          <h3>Ali Raza</h3>
+          <span class="role">Photographer</span>
+        </div>
+      </div>
+      <p class="review">
+        “Amazing app! I saved so much time by trying different looks virtually. Highly recommended for everyone.”
+      </p>
+      <div class="stars">★★★★☆</div>
+    </div>
+
+    <div class="testimonial-card glass">
+      <div class="user">
+        <img src="https://i.pravatar.cc/80?img=8" alt="User 3">
+        <div>
+          <h3>Sara Malik</h3>
+          <span class="role">Designer</span>
+        </div>
+      </div>
+      <p class="review">
+        “It’s fun, simple, and stylish. The interface feels premium and the results look realistic!”
+      </p>
+      <div class="stars">★★★★★</div>
+    </div>
+
+  </div>
+</section>
+<!-- ===== Deals Section ===== -->
+<section id="deals" class="deals-section">
+  <h2 class="section-title">Exclusive Deals & Offers</h2>
+  <div class="deals-grid">
+
+    <!-- Deal Card 1 -->
+    <div class="deal-card glass">
+      <div class="deal-img">
+        <img src="../assests/d1.png" alt="Kids Haircut">
+      </div>
+      <div class="deal-content">
+        <h3>Free Kids Haircut 🎉</h3>
+        <p>Bring your child under 10 years and enjoy a free haircut every Sunday.</p>
+        <button class="btn deal-btn" data-title="Free Kids Haircut 🎉" data-detail="Bring your child under 10 years and enjoy a free haircut every Sunday.">Grab Deal</button>
+      </div>
+    </div>
+
+    <!-- Deal Card 2 -->
+    <div class="deal-card glass">
+      <div class="deal-img">
+        <img src="../assests/d2.png" alt="First Try Offer">
+      </div>
+      <div class="deal-content">
+        <h3>50% Off First Try ✂️</h3>
+        <p>New to StyleMorph? Get your very first hairstyle try-on at half price!</p>
+        <button class="btn deal-btn" data-title="50% Off First Try ✂️" data-detail="New to StyleMorph? Get your very first hairstyle try-on at half price!">Avail Now</button>
+      </div>
+    </div>
+
+    <!-- Deal Card 3 -->
+    <div class="deal-card glass">
+      <div class="deal-img">
+        <img src="../assests/d3.png" alt="Family Package">
+      </div>
+      <div class="deal-content">
+        <h3>Family Package 👨‍👩‍👧</h3>
+        <p>Book hairstyles for 3 family members together and get 1 free.</p>
+        <button class="btn deal-btn" data-title="Family Package 👨‍👩‍👧" data-detail="Book hairstyles for 3 family members together and get 1 free.">Book Now</button>
+      </div>
+    </div>
+
+  </div>
+</section>
+<!-- ===== Welcome Modal ===== -->
+<div id="welcomeModal" class="modal">
+  <div class="modal-content glass">
+    <span class="close">&times;</span>
+    <h2>👋 Welcome to StyleMorph!</h2>
+    <p>Discover amazing hairstyles, try new looks, and grab exclusive deals!</p>
+    <button class="btn" id="welcomeBtn">Let’s Start</button>
+  </div>
+</div>
+
+<!-- ===== Deals Modal ===== -->
+<div id="dealModal" class="modal">
+  <div class="modal-content glass">
+    <span class="close">&times;</span>
+    <h3 id="modalTitle"></h3>
+    <p id="modalDetail"></p>
+    <button class="btn" id="claimOfferBtn">🎁 Claim Offer</button>
+  </div>
+</div>
+
+<!-- ===== Booking Section ===== -->
+<section id="booking" class="section booking-section glass">
+  <h2 class="section-title">✂️ Book Your Appointment</h2>
+
+  <!-- Booking Form -->
+  <form id="bookingForm" class="booking-form">
+    <div class="form-group">
+      <label for="name">Full Name</label>
+      <input type="text" id="name" placeholder="Enter your full name" required>
+    </div>
+
+    <div class="form-group">
+      <label for="email">Email</label>
+      <input type="email" id="email" placeholder="Enter your email" required>
+    </div>
+
+    <div class="form-group">
+      <label for="phone">Phone Number</label>
+      <input type="tel" id="phone" placeholder="Enter your phone number" required>
+    </div>
+
+    <div class="form-group">
+      <label for="service">Select Service</label>
+      <select id="service" required>
+        <option value="">-- Choose a Service --</option>
+        <option value="Haircut">Haircut</option>
+        <option value="Hair Coloring">Hair Coloring</option>
+        <option value="Styling">Styling</option>
+        <option value="Hair Spa">Hair Spa</option>
+      </select>
+    </div>
+
+    <!-- Custom Calendar -->
+    <div class="form-group">
+      <label for="date">Choose Date</label>
+      <input type="date" id="date" min="" required>
+    </div>
+
+    <!-- Time Slots -->
+    <div class="form-group">
+      <label>Choose Time</label>
+      <div class="time-slots" id="timeSlots">
+        <button type="button" class="slot">10:00 AM</button>
+        <button type="button" class="slot">11:00 AM</button>
+        <button type="button" class="slot">12:00 PM</button>
+        <button type="button" class="slot">02:00 PM</button>
+        <button type="button" class="slot">03:00 PM</button>
+        <button type="button" class="slot">04:00 PM</button>
+        <button type="button" class="slot">05:00 PM</button>
+      </div>
+      <input type="hidden" id="time" required>
+    </div>
+
+    <button type="submit" class="btn">📅 Confirm Booking</button>
+  </form>
+
+  <!-- Success Message -->
+  <p id="successMessage" class="success-message"></p>
+
+  <!-- Booking List (Admin Dashboard style) -->
+  <h3 class="section-subtitle">📋 Booking List</h3>
+  <div class="booking-table-wrapper">
+    <table id="bookingTable" class="booking-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Service</th>
+          <th>Date</th>
+          <th>Time</th>
+          <th>Phone</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Bookings will appear here -->
+      </tbody>
+    </table>
+  </div>
+</section>
+</section>
+
+
+<!-- ===== Customer Reviews Section ===== -->
+<section id="reviews" class="section reviews-section glass">
+  <h2 class="section-title">💬 Customer Reviews</h2>
+  <p class="lead">We value your feedback! Share your experience with us ✨</p>
+
+  <!-- Review Form -->
+  <form id="reviewForm" class="review-form">
+    <div class="form-group">
+      <label for="reviewName">Your Name</label>
+      <input type="text" id="reviewName" placeholder="Enter your name" required>
+    </div>
+
+    <div class="form-group rating-group">
+      <label>Your Rating</label>
+      <div id="ratingStars" class="rating-stars">
+        <span data-star="1">★</span>
+        <span data-star="2">★</span>
+        <span data-star="3">★</span>
+        <span data-star="4">★</span>
+        <span data-star="5">★</span>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="reviewText">Your Review</label>
+      <textarea id="reviewText" rows="4" placeholder="Write your review here..." required></textarea>
+    </div>
+
+    <button type="submit" class="btn">✨ Submit Review</button>
+  </form>
+
+  <!-- Reviews List -->
+  <div id="reviewsList" class="reviews-list">
+    <!-- Reviews will appear here -->
+  </div>
+</section>
+    </div>
+
+<script src="script.js"></script>
+  </body>
+</html>

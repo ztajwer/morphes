@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>StyleMorph — Women’s Clothes</title>
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+      /* Navbar responsive */
+      .hamburger {
+        display: none;
+        background: none;
+        border: none;
+        color: white;
+        font-size: 26px;
+        cursor: pointer;
+        margin-left: auto;
+      }
+
+      .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      @media (max-width: 768px) {
+        .hamburger {
+          display: block;
+        }
+        .nav-links {
+          position: absolute;
+          top: 70px;
+          right: 16px;
+          left: 16px;
+          flex-direction: column;
+          background: rgba(30, 30, 40, 0.95);
+          border-radius: 12px;
+          padding: 12px;
+          gap: 12px;
+          display: none;
+        }
+        .nav-links.show {
+          display: flex;
+          animation: slideDown 0.3s ease-out;
+        }
+      }
+
+      @keyframes slideDown {
+        from {
+          opacity: 0;
+          transform: translateY(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      @media (max-width: 768px) {
+        .nav-links {
+          display: none;
+          flex-direction: column;
+          background: rgba(30, 30, 40, 0.95);
+          border-radius: 12px;
+          padding: 12px;
+          gap: 12px;
+          position: absolute;
+          top: 70px;
+          right: 16px;
+          left: 16px;
+        }
+        .nav-links.show {
+          display: flex;
+          animation: slideDown 0.3s ease-out;
+        }
+      }
+
+      /* Navbar */
+      .nav {
+        position: fixed;
+        inset: 16px 16px auto 16px;
+        height: 64px;
+        z-index: 50;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 14px;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 800;
+        letter-spacing: 0.5px;
+      }
+      .brand .logo {
+        width: 40px;
+        height: 40px;
+        display: grid;
+        place-items: center;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #0ea5e9, #a855f7);
+        box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.25),
+          0 8px 18px rgba(0, 0, 0, 0.35);
+      }
+      .brand .logo svg {
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+      }
+      .nav a.link {
+        padding: 10px 12px;
+        border-radius: 12px;
+        color: rgb(var(--muted));
+        font-weight: 600;
+      }
+      .nav a.link.active,
+      .nav a.link:hover {
+        color: white;
+        background: rgba(255, 255, 255, 0.07);
+      }
+      .spacer {
+        flex: 1;
+      }
+      .btn {
+        padding: 10px 14px;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(255, 255, 255, 0.06);
+        color: white;
+        cursor: pointer;
+      }
+      .btn:hover {
+        background: rgba(255, 255, 255, 0.1);
+      }
+      :root {
+        --bg: 18 18 27;
+        --glass: 255 255 255;
+        --ink: 240 240 247;
+        --acc: 236 72 153;
+        --muted: 148 163 184;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto,
+          sans-serif;
+        color: rgb(var(--ink));
+        background: radial-gradient(
+            80vmax 60vmax at 10% 10%,
+            #db2777 0%,
+            transparent 60%
+          ),
+          radial-gradient(80vmax 60vmax at 90% 20%, #9333ea 0%, transparent 60%),
+          rgb(var(--bg));
+        overflow-x: hidden;
+      }
+
+      main {
+        padding: 100px 20px;
+        max-width: 1100px;
+        margin: 0 auto;
+      }
+
+      h1 {
+        font-size: clamp(28px, 4vw, 44px);
+        margin: 0 0 12px;
+      }
+      p.lead {
+        color: rgb(var(--muted));
+        margin-bottom: 30px;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+      }
+      .card {
+        border-radius: 20px;
+        overflow: hidden;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+        display: flex;
+        flex-direction: column;
+        cursor: pointer;
+        transition: transform 0.2s;
+      }
+      .card:hover {
+        transform: translateY(-4px);
+      }
+      .card img {
+        width: 100%;
+        height: 320px;
+        object-fit: cover;
+      }
+      .card .info {
+        padding: 16px;
+      }
+      .card .info h3 {
+        margin: 0 0 8px;
+        font-size: 18px;
+      }
+      .card .info p {
+        margin: 0;
+        font-size: 14px;
+        color: rgb(var(--muted));
+      }
+
+      /* Modal */
+      .modal {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.6);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 100;
+      }
+      .modal.active {
+        display: flex;
+      }
+      .modal-content {
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        padding: 20px;
+        max-width: 900px;
+        width: 90%;
+        max-height: 80vh;
+        overflow: auto;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+      }
+      .modal-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 16px;
+      }
+      .modal-grid img {
+        width: 100%;
+        height: 240px;
+        object-fit: cover;
+        border-radius: 16px;
+        cursor: pointer;
+        transition: transform 0.2s;
+      }
+      .modal-grid img:hover {
+        transform: scale(1.05);
+      }
+      .close {
+        display: block;
+        margin-left: auto;
+        margin-bottom: 12px;
+        cursor: pointer;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="nav glass" role="navigation" aria-label="Main">
+      <div class="brand" aria-label="StyleMorph Logo">
+        <div class="logo" aria-hidden="true">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
+            <path
+              d="M4 14c0-6 5-9 8-10 3 1 8 4 8 10 0 4-3 6-6 6-1.7 0-3-.6-4-1.7-.9 1.1-2.3 1.7-4 1.7 3-1.5 2-6 2-8"
+              stroke="#fff"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </div>
+        <div>
+          StyleMorph <span class="muted" style="font-weight: 600">Hair</span>
+        </div>
+      </div>
+
+      <!-- Hamburger -->
+      <button class="hamburger" id="navToggle" aria-label="Toggle menu">
+        ☰
+      </button>
+
+      <div class="nav-links" id="navLinks">
+        <a class="link" data-route="home" href="index.html">Home</a>
+        <a class="link" data-route="try" href="index.html#try">Try-On</a>
+        <a class="link" data-route="gallery" href="index.html#gallery">Gallery</a>
+        <a class="link" data-route="profile" href="index.html#profile">Profile</a>
+        <a class="link" data-route="saved" href="index.html#saved">Saved</a>
+        <a class="link" href="real-try.html">Real-Try</a>
+        <a class="link" href="mens.html">Mens Wears</a>
+        <a class="link" href="women.html">Womens Wear</a>
+      </div>
+
+      <!-- Keep Export button always visible -->
+      <button class="btn" id="exportBtn">Export PNG</button>
+    </nav>
+    <main>
+      <h1>Women’s Hairstyles</h1>
+      <p class="lead">
+        Explore elegant outfits and try them on virtually with our projector.
+      </p>
+
+      <div class="grid">
+        <div class="card" data-category="dresses">
+          <img
+            src="../assests/style1.png"
+            alt="Dress"
+            height="200px"
+            width="200px"
+          />
+          <div class="info">
+            <h3>Elegant Look</h3>
+            <p>Evening style</p>
+          </div>
+        </div>
+        <div class="card" data-category="casual">
+          <img src="../assests/style2.png" alt="Casual" />
+          <div class="info">
+            <h3>Casual Look</h3>
+            <p>Comfort & chic</p>
+          </div>
+        </div>
+        <div class="card" data-category="ethnic">
+          <img src="../assests/style3.png" alt="Ethnic" />
+          <div class="info">
+            <h3>Bob Cut</h3>
+            <p>Traditional Look</p>
+          </div>
+        </div>
+
+        <div class="card" data-category="ethnic">
+          <img src="../assests/style4.png" alt="Ethnic" />
+          <div class="info">
+            <h3>Bob Cut</h3>
+            <p>Traditional wear</p>
+          </div>
+        </div>
+        <div class="card" data-category="ethnic">
+          <img src="../assests/style5.png" alt="Ethnic" />
+          <div class="info">
+            <h3>Bob Cut</h3>
+            <p>Traditional wear</p>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Modal -->
+    <div class="modal" id="modal">
+      <div class="modal-content glass">
+        <span class="close" id="closeModal">✖</span>
+        <h2>Select Outfit</h2>
+        <div class="modal-grid" id="modalGrid">
+          <!-- Filled dynamically -->
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const cards = document.querySelectorAll(".card");
+      const modal = document.getElementById("modal");
+      const closeModal = document.getElementById("closeModal");
+      const modalGrid = document.getElementById("modalGrid");
+
+      const outfits = {
+        dresses: [
+          "assets/women-dress1.jpg",
+          "assets/women-dress2.jpg",
+          "assets/women-dress3.jpg",
+        ],
+        casual: [
+          "assets/women-casual1.jpg",
+          "assets/women-casual2.jpg",
+          "assets/women-casual3.jpg",
+        ],
+        ethnic: [
+          "assets/women-ethnic1.jpg",
+          "assets/women-ethnic2.jpg",
+          "assets/women-ethnic3.jpg",
+        ],
+      };
+
+      cards.forEach((card) => {
+        card.addEventListener("click", () => {
+          const cat = card.dataset.category;
+          modalGrid.innerHTML = "";
+          outfits[cat].forEach((src) => {
+            const img = document.createElement("img");
+            img.src = src;
+            img.onclick = () => {
+              alert(
+                "Selected: " + src + " (here you can send to projector overlay)"
+              );
+              modal.classList.remove("active");
+            };
+            modalGrid.appendChild(img);
+          });
+          modal.classList.add("active");
+        });
+      });
+
+      closeModal.onclick = () => modal.classList.remove("active");
+      modal.onclick = (e) => {
+        if (e.target === modal) modal.classList.remove("active");
+      };
+      // Navbar toggle for mobile
+      document.getElementById("navToggle").addEventListener("click", () => {
+        document.getElementById("navLinks").classList.toggle("show");
+      });
+    </script>
+  </body>
+</html>
